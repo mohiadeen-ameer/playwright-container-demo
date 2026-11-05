@@ -1,0 +1,12 @@
+{
+  "deckTitle": "Release Radar",
+  "deckSubtitle": "Demo screenshots, captured automatically in the Playwright container",
+  "shots": [
+    { "name": "01-dashboard-light", "title": "Dashboard", "url": "/", "viewport": "desktop", "colorScheme": "light" },
+    { "name": "02-dashboard-dark", "title": "Dashboard in dark mode", "url": "/", "viewport": "desktop", "colorScheme": "dark" },
+    { "name": "03-release-details", "title": "Release details panel", "url": "/", "viewport": "desktop", "colorScheme": "dark", "click": "tr[data-release='3.0.0']", "waitFor": ".panel.open" },
+    { "name": "04-mobile", "title": "On a phone", "url": "/", "viewport": "mobile", "colorScheme": "dark", "fullPage": true },
+    { "name": "05-safari-webkit", "title": "Same page in WebKit (Safari's engine)", "url": "/", "viewport": "desktop", "colorScheme": "light", "browser": "webkit" },
+    { "name": "06-live-site", "title": "Any live URL works too", "url": "https://mohiadeen-ameer.github.io/blogs/", "viewport": "desktop", "colorScheme": "dark" }
+  ]
+}

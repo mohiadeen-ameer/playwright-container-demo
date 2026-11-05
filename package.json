@@ -1,0 +1,16 @@
+{
+  "name": "playwright-container-demo",
+  "private": true,
+  "type": "module",
+  "description": "Screenshots and a slide deck from any web app, using Microsoft's Playwright container",
+  "scripts": {
+    "shoot": "node shoot.mjs",
+    "test": "playwright test"
+  },
+  "dependencies": {
+    "playwright": "1.64.1"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1"
+  }
+}

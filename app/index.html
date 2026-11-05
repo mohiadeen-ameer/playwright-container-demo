@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Release Radar</title>
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand"><span class="logo">RR</span> Release Radar</div>
+  <span class="env">production</span>
+</header>
+
+<main class="wrap">
+  <section class="intro">
+    <h1>This week's releases</h1>
+    <p>Demo data for screenshots. Click a release to see its details.</p>
+  </section>
+
+  <section class="kpis">
+    <div class="kpi"><span class="label">Deploys</span><b>42</b><span class="delta up">+8 vs last week</span></div>
+    <div class="kpi"><span class="label">Change failure rate</span><b>4.8%</b><span class="delta up">−1.2 pts</span></div>
+    <div class="kpi"><span class="label">Lead time</span><b>1.6 d</b><span class="delta up">−0.4 d</span></div>
+    <div class="kpi"><span class="label">Time to restore</span><b>38 min</b><span class="delta down">+6 min</span></div>
+  </section>
+
+  <section class="grid">
+    <div class="card">
+      <h2>Deploys per day</h2>
+      <div class="bars" id="bars"></div>
+    </div>
+    <div class="card">
+      <h2>Releases</h2>
+      <table>
+        <thead><tr><th>Service</th><th>Version</th><th>Status</th></tr></thead>
+        <tbody id="releases"></tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<aside class="panel" id="panel" aria-hidden="true">
+  <button class="close" id="close" aria-label="Close">×</button>
+  <div id="panelBody"></div>
+</aside>
+
+<script>
+const releases = [
+  { service: "checkout-api", version: "2.4.0", status: "healthy", owner: "Payments", changes: ["Retry budget on card auth", "Upgrade to Java 21", "New p99 latency alert"] },
+  { service: "search", version: "5.1.3", status: "healthy", owner: "Discovery", changes: ["Faster facet queries", "Index warm-up on deploy"] },
+  { service: "notifications", version: "1.9.2", status: "watching", owner: "Platform", changes: ["Batch email sends", "Kafka consumer lag dashboard"] },
+  { service: "inventory", version: "3.0.0", status: "rolled back", owner: "Supply", changes: ["Schema migration v3", "Rolled back: lock contention under load"] },
+  { service: "web-frontend", version: "8.12.0", status: "healthy", owner: "Web", changes: ["Dark mode", "Lighthouse score 96"] }
+];
+const days = [["Mon", 6], ["Tue", 9], ["Wed", 7], ["Thu", 11], ["Fri", 9]];
+
+const max = Math.max(...days.map(d => d[1]));
+document.getElementById("bars").innerHTML = days.map(([d, n]) =>
+  `<div class="bar"><span class="n">${n}</span><i style="height:${(n / max) * 100}%"></i><span class="d">${d}</span></div>`).join("");
+
+document.getElementById("releases").innerHTML = releases.map(r =>
+  `<tr data-release="${r.version}" tabindex="0"><td>${r.service}</td><td><code>${r.version}</code></td>` +
+  `<td><span class="pill ${r.status.replace(" ", "-")}">${r.status}</span></td></tr>`).join("");
+
+const panel = document.getElementById("panel");
+function open(version) {
+  const r = releases.find(x => x.version === version);
+  document.getElementById("panelBody").innerHTML =
+    `<p class="eyebrow">${r.owner}</p><h3>${r.service} <code>${r.version}</code></h3>` +
+    `<span class="pill ${r.status.replace(" ", "-")}">${r.status}</span>` +
+    `<h4>What changed</h4><ul>${r.changes.map(c => `<li>${c}</li>`).join("")}</ul>`;
+  panel.classList.add("open");
+  panel.setAttribute("aria-hidden", "false");
+}
+document.getElementById("releases").addEventListener("click", e => {
+  const row = e.target.closest("tr[data-release]");
+  if (row) open(row.dataset.release);
+});
+document.getElementById("close").addEventListener("click", () => {
+  panel.classList.remove("open");
+  panel.setAttribute("aria-hidden", "true");
+});
+</script>
+</body>
+</html>
