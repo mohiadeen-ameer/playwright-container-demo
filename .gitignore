@@ -3,3 +3,4 @@ out/
 playwright-report/
 test-results/
 .DS_Store
+synthetic-report/

@@ -1,0 +1,23 @@
+# A shared browser server + a test runner that uses it.
+#   docker compose up --abort-on-container-exit --exit-code-from tests
+services:
+  browsers:
+    image: mcr.microsoft.com/playwright:v1.64.1-noble
+    user: pwuser
+    working_dir: /home/pwuser
+    init: true
+    ipc: host
+    command: ["npx", "-y", "playwright@1.64.1", "run-server", "--port", "3000", "--host", "0.0.0.0"]
+    healthcheck:
+      test: ["CMD", "bash", "-c", "echo > /dev/tcp/127.0.0.1/3000"]
+      interval: 2s
+      retries: 30
+
+  tests:
+    build: .
+    depends_on:
+      browsers:
+        condition: service_healthy
+    environment:
+      PW_WS: ws://browsers:3000/
+    command: ["npx", "playwright", "test", "--project=chromium"]

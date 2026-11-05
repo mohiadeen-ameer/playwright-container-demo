@@ -9,6 +9,11 @@ export default defineConfig({
     baseURL: "http://127.0.0.1:4173",
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
+    // When PW_WS is set, use a remote browser server (see compose.yaml) instead of local browsers.
+    // exposeNetwork lets the remote browser reach this container's localhost (the app under test).
+    ...(process.env.PW_WS
+      ? { connectOptions: { wsEndpoint: process.env.PW_WS, exposeNetwork: "<loopback>" } }
+      : {}),
   },
   expect: {
     // Pixel-perfect: the container renders identically everywhere, so no fuzz is needed.

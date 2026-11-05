@@ -12,7 +12,11 @@ Blog post: [Playwright in a Container: Screenshots, Slides and Tests with Only D
 | `shoot.mjs` + `shots.json` | Takes the screenshots listed in `shots.json` and builds `out/deck.pdf` |
 | `tests/` + `playwright.config.ts` | Functional and visual regression tests in Chromium, WebKit and mobile |
 | `shoot.sh`, `test.sh` | One-line wrappers that run everything in the container |
-| `.github/workflows/playwright.yml` | The same container in GitHub Actions |
+| `Dockerfile` | A self-contained test image built `FROM` Playwright's image |
+| `compose.yaml` | A shared browser server + a test runner that connects to it |
+| `synthetic/` + `playwright.synthetic.config.ts` | Scheduled checks against a live production site |
+| `.github/workflows/playwright.yml` | CI: tests in 3 parallel shards + screenshots and deck |
+| `.github/workflows/synthetic.yml` | Synthetic monitoring every 30 minutes |
 
 ## Quick start
 
@@ -30,6 +34,24 @@ You only need Docker.
 ```
 
 The first run downloads the image (about 3.5 GB). After that, a full run takes a few seconds.
+
+## Production patterns
+
+```sh
+# 1. Bake the tests into an image (runs as non-root pwuser)
+docker build -t release-radar-tests .
+docker run --rm --ipc=host release-radar-tests
+
+# 2. Shared browser server: browsers in one container, tests in another
+docker compose up --build --abort-on-container-exit --exit-code-from tests
+
+# 3. Split the suite across machines
+./test.sh --shard=1/3
+
+# 4. Synthetic monitoring of a live site (SITE_URL to point it elsewhere)
+docker run --rm --ipc=host -v "$PWD":/work -w /work mcr.microsoft.com/playwright:v1.64.1-noble \
+  bash -c "npm ci && npx playwright test -c playwright.synthetic.config.ts"
+```
 
 ## Capture your own pages
 

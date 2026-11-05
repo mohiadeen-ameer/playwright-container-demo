@@ -1,0 +1,26 @@
+name: Synthetic monitoring
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"   # every 30 minutes
+  workflow_dispatch:
+
+jobs:
+  check-production:
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.64.1-noble
+      options: --ipc=host
+    env:
+      HOME: /root
+    steps:
+      - uses: actions/checkout@v4
+      - run: npm ci --no-audit --no-fund
+      - name: Check the live site like a user
+        run: npx playwright test -c playwright.synthetic.config.ts
+      - name: Keep evidence when it fails
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: synthetic-report
+          path: synthetic-report/
