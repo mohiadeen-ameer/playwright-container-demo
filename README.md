@@ -33,7 +33,7 @@ You only need Docker.
 ./test.sh --update-snapshots
 ```
 
-The first run downloads the image (about 3.5 GB). After that, a full run takes a few seconds.
+The first run downloads the image (about 1 GB, 3.5 GB unpacked). After that, a full run takes a few seconds.
 
 ## Production patterns
 
